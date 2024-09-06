@@ -5,11 +5,13 @@ const userController = require("../controllers/user");
 const fileController = require("../controllers/file.controller");
 const regestationController = require("../controllers/regestation");
 const gridController = require("../controllers/grid");
+const topController= require("../controllers/top")
 const {
   loginUpValidataion,
   signUpValidation,
   forgetPasswordUpValidataion,
   gridValidataion,
+  topValidataion
 } = require("../helper/validation");
 
 // User Auth route
@@ -40,6 +42,7 @@ router.get("/files", fileController.getListFiles);
 router.get("/files/:name", fileController.download);
 router.delete("/files/:name", fileController.remove);
 
-router.get("/list-grid", auth.verifyToken, gridController.get);
+router.get("/list-grid", gridController.get);
+router.get("/list-top", topController.get);
 
 module.exports = router; // export to use in server.js

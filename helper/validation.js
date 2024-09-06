@@ -30,3 +30,7 @@ exports.gridValidataion = [
   check("team", "Team Name is required").not().isEmpty(),
   check("future", "Future is required").not().isEmpty(),
 ];
+exports.topValidataion = [
+  check("home_team", "Home Team is required").not().isEmpty(),
+  check("away_team", "Away Team is required").not().isEmpty(),
+];

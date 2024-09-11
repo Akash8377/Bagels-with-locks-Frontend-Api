@@ -40,7 +40,8 @@ app.all("*", (req, res, next) => {
 
 app.use(errorHandler);
 
-const hostname = process.env.HOST || "127.0.0.1";
+const hostname = process.env.HOST;
+// const hostname = process.env.HOST || "127.0.0.1";
 const port = process.env.PORT || 8800;
 
 app.listen(port, hostname, () => {

@@ -59,7 +59,7 @@ exports.register = (req, res) => {
               // Generate verification token and link
               /* const randomToken = randomstring.generate();
               let mailSubjet = "Email Mail Verification";
-              let verificationLink = `http://127.0.0.1:9900/user/mail-verification/${randomToken}`;
+              let verificationLink = `https://127.0.0.1:9900/user/mail-verification/${randomToken}`;
               const template = await fs.readFile(
                 "views/sendveryfactionmail.ejs",
                 "utf-8"
@@ -251,7 +251,7 @@ exports.forget_password = (req, res) => {
       if (result.length > 0) {
         let mailSubjet = "Reset Your Password";
         const randomToken = randomstring.generate();
-        let verificationLink = `http://127.0.0.1:9900/reset-password?token=${randomToken}`;
+        let verificationLink = `https://127.0.0.1:9900/reset-password?token=${randomToken}`;
         const template = await fs.readFile(
           "views/send-reset-password-mail.ejs",
           "utf-8"

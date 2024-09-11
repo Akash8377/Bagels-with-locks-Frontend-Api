@@ -1,6 +1,4 @@
 const express = require("express");
-const https = require("https");
-const fs = require("fs");
 const routes = require("./routes/routes");
 const webRoutes = require("./routes/webRoutes");
 const bodyParser = require("body-parser");
@@ -11,12 +9,6 @@ const path = require("path");
 require("dotenv").config();
 const cors = require("cors");
 const session = require("express-session");
-
-// Load SSL certificate and key
-const sslOptions = {
-  key: fs.readFileSync("./server.key"),
-  cert: fs.readFileSync("./server.cert"),
-};
 
 const app = express();
 
@@ -36,9 +28,9 @@ app.use(
   })
 );
 
-// CORS configuration
+// CORS configuration - Update with specific origin as needed
 app.use(cors({
-  origin: "https://main.d34kdk1553ergm.amplifyapp.com",  // Frontend URL
+  origin: "*",  // Allow all origins or specify your frontend domain for security (e.g., 'http://your-frontend-domain.com')
   methods: "GET,HEAD,PUT,PATCH,POST,DELETE",
   credentials: true,
 }));
@@ -67,8 +59,8 @@ app.use(errorHandler);
 const hostname = process.env.HOST || "0.0.0.0";  // Listen on all network interfaces
 const port = process.env.PORT || 8800;
 
-https.createServer(sslOptions, app).listen(port, hostname, () => {
-  console.log(`HTTPS Server running on https://${hostname}:${port}`);
+app.listen(port, hostname, () => {
+  console.log(`Server running on http://${hostname}:${port}`);
 });
 
 module.exports = app;

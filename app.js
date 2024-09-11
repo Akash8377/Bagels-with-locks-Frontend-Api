@@ -28,9 +28,9 @@ app.use(
   })
 );
 
-// CORS configuration - Update with specific origin as needed
+// CORS configuration - Allow only your frontend domain
 app.use(cors({
-  origin: "*",  // Allow all origins or specify your frontend domain for security (e.g., 'http://your-frontend-domain.com')
+  origin: "https://main.d34kdk1553ergm.amplifyapp.com",  // Frontend URL
   methods: "GET,HEAD,PUT,PATCH,POST,DELETE",
   credentials: true,
 }));

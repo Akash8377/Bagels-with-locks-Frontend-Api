@@ -6,20 +6,11 @@ const morgan = require("morgan");
 const AppError = require("./utils/appError");
 const errorHandler = require("./utils/errorHandler");
 const path = require("path");
-const https = require("https");
-const http = require("http");
-const fs = require("fs");
 require("dotenv").config();
 const cors = require("cors");
 const session = require("express-session");
 
 const app = express();
-
-// Load SSL certificates
-const httpsOptions = {
-  key: fs.readFileSync(path.join(__dirname, './server.key')),
-  cert: fs.readFileSync(path.join(__dirname, './server.cert'))
-};
 
 // Set up view engine and public folder
 app.set("view engine", "ejs");
@@ -37,9 +28,9 @@ app.use(
   })
 );
 
-// CORS configuration
+// CORS configuration - Update with specific origin as needed
 app.use(cors({
-  origin: "*",
+  origin: "*",  // Allow all origins or specify your frontend domain for security (e.g., 'http://your-frontend-domain.com')
   methods: "GET,HEAD,PUT,PATCH,POST,DELETE",
   credentials: true,
 }));
@@ -65,21 +56,11 @@ app.all("*", (req, res, next) => {
 app.use(errorHandler);
 
 // Server setup
-const hostname = process.env.HOST || "0.0.0.0";
-const httpPort = process.env.PORT || 8800; // HTTP Port
-const httpsPort = process.env.HTTPS_PORT || 8443; // HTTPS Port
+const hostname = process.env.HOST || "0.0.0.0";  // Listen on all network interfaces
+const port = process.env.PORT || 8800;
 
-// Create HTTP server (Optional: redirect HTTP to HTTPS)
-http.createServer((req, res) => {
-  res.writeHead(301, { "Location": `https://${req.headers.host}${req.url}` });
-  res.end();
-}).listen(httpPort, hostname, () => {
-  console.log(`HTTP server running on http://${hostname}:${httpPort}`);
-});
-
-// Create HTTPS server
-https.createServer(httpsOptions, app).listen(httpsPort, hostname, () => {
-  console.log(`HTTPS server running on https://${hostname}:${httpsPort}`);
+app.listen(port, hostname, () => {
+  console.log(`Server running on https://${hostname}:${port}`);
 });
 
 module.exports = app;

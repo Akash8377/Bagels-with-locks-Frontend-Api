@@ -30,7 +30,7 @@ app.use(
 
 // CORS configuration - Update with specific origin as needed
 app.use(cors({
-  origin: "*",  // Allow all origins or specify your frontend domain for security (e.g., 'https://your-frontend-domain.com')
+  origin: "*",  // Allow all origins or specify your frontend domain for security (e.g., 'http://your-frontend-domain.com')
   methods: "GET,HEAD,PUT,PATCH,POST,DELETE",
   credentials: true,
 }));
@@ -60,7 +60,7 @@ const hostname = process.env.HOST || "0.0.0.0";  // Listen on all network interf
 const port = process.env.PORT || 8800;
 
 app.listen(port, hostname, () => {
-  console.log(`Server running on https://${hostname}:${port}`);
+  console.log(`Server running on http://${hostname}:${port}`);
 });
 
 module.exports = app;

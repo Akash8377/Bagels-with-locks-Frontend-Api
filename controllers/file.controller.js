@@ -1,6 +1,6 @@
 const uploadFile = require("../middleware/upload");
 const fs = require("fs");
-const baseUrl = "https://localhost:8800/files/";
+const baseUrl = "http://localhost:8800/files/";
 
 const upload = async (req, res) => {
   try {

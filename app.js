@@ -17,8 +17,8 @@ const app = express();
 
 // Load SSL certificates
 const httpsOptions = {
-  key: fs.readFileSync('./path/to/server.key'),
-  cert: fs.readFileSync('./path/to/server.cert')
+  key: fs.readFileSync(path.join(__dirname, './server.key')),
+  cert: fs.readFileSync(path.join(__dirname, './server.cert'))
 };
 
 // Set up view engine and public folder

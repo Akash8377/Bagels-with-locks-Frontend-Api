@@ -10,6 +10,7 @@ require("dotenv").config();
 const cors = require("cors");
 const session = require("express-session"); // Import the cors middleware
 const app = express();
+
 app.set("view engine", "ejs");
 app.set("views", "./views");
 
@@ -25,8 +26,10 @@ app.use(
     saveUninitialized: true,
   })
 );
+
 // Use cors middleware
 app.use(cors());
+
 // Static Middleware
 app.use(express.json());
 app.use(bodyParser.json());
@@ -40,7 +43,7 @@ app.all("*", (req, res, next) => {
 
 app.use(errorHandler);
 
-const hostname = process.env.HOST || "127.0.0.1"; // Use localhost or 0.0.0.0 for local development
+const hostname = process.env.HOST || "0.0.0.0"; // Listen on all network interfaces
 const port = process.env.PORT || 8800;
 
 app.listen(port, hostname, () => {

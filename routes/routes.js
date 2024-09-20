@@ -5,7 +5,12 @@ const userController = require("../controllers/user");
 const fileController = require("../controllers/file.controller");
 const regestationController = require("../controllers/regestation");
 const gridController = require("../controllers/grid");
-const topController= require("../controllers/top")
+const topController= require("../controllers/top");
+const pickController = require("../controllers/wadepick");
+const liveController = require("../controllers/adamlive");
+const futureController = require("../controllers/adamfuture");
+const slipController = require("../controllers/adamslip");
+const articleController = require("../controllers/article")
 const {
   loginUpValidataion,
   signUpValidation,
@@ -44,5 +49,11 @@ router.delete("/files/:name", fileController.remove);
 
 router.get("/list-grid", gridController.get);
 router.get("/list-top", topController.get);
+router.get("/list-pick", pickController.get);
+
+router.get("/list-live", liveController.get);
+router.get("/list-future", futureController.get);
+router.get("/list-slip", slipController.get);
+router.get("/list-article", articleController.get);
 
 module.exports = router; // export to use in server.js

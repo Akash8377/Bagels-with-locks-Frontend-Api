@@ -57,7 +57,7 @@ app.use(errorHandler);
 
 // Server setup
 const hostname = process.env.HOST || "0.0.0.0";  // Listen on all network interfaces
-const port = process.env.PORT || 8443;
+const port = process.env.PORT || 9000;
 
 app.listen(port, hostname, () => {
   console.log(`Server running on https://${hostname}:${port}`);

@@ -9,6 +9,7 @@ const path = require("path");
 require("dotenv").config();
 const cors = require("cors");
 const session = require("express-session");
+const stripe = require("stripe")(process.env.STRIPE_SECRET_KEY); // Add Stripe secret key
 
 const app = express();
 
@@ -28,9 +29,9 @@ app.use(
   })
 );
 
-// CORS configuration - Update with specific origin as needed
+// CORS configuration
 app.use(cors({
-  origin: "*",  // Allow all origins or specify your frontend domain for security (e.g., 'http://your-frontend-domain.com')
+  origin: "*",  // Update this to your frontend domain for better security
   methods: "GET,HEAD,PUT,PATCH,POST,DELETE",
   credentials: true,
 }));
@@ -42,6 +43,27 @@ app.use(express.urlencoded({ extended: true }));
 
 // Logger middleware
 app.use(morgan("tiny"));
+
+// Stripe payment route
+app.post("/create-payment-intent", async (req, res, next) => {
+  try {
+    const { amount } = req.body;
+
+    // Create a PaymentIntent with the order amount and currency
+    const paymentIntent = await stripe.paymentIntents.create({
+      amount: Math.round(amount * 100), // Stripe works with the smallest currency unit
+      currency: "usd", // Change this to match your preferred currency
+      payment_method_types: ["card"], // Payment methods, can be expanded to more
+    });
+
+    // Send client secret to the frontend
+    res.send({
+      clientSecret: paymentIntent.client_secret,
+    });
+  } catch (error) {
+    next(new AppError(error.message, 500));
+  }
+});
 
 // Routes
 app.use("/", routes);
@@ -56,7 +78,7 @@ app.all("*", (req, res, next) => {
 app.use(errorHandler);
 
 // Server setup
-const hostname = process.env.HOST || "0.0.0.0";  // Listen on all network interfaces
+const hostname = process.env.HOST || "0.0.0.0"; // Listen on all network interfaces
 const port = process.env.PORT || 9000;
 
 app.listen(port, hostname, () => {

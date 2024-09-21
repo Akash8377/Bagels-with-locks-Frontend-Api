@@ -10,7 +10,8 @@ const pickController = require("../controllers/wadepick");
 const liveController = require("../controllers/adamlive");
 const futureController = require("../controllers/adamfuture");
 const slipController = require("../controllers/adamslip");
-const articleController = require("../controllers/article")
+const articleController = require("../controllers/article");
+const betController = require("../controllers/waderecord")
 const {
   loginUpValidataion,
   signUpValidation,
@@ -55,5 +56,6 @@ router.get("/list-live", liveController.get);
 router.get("/list-future", futureController.get);
 router.get("/list-slip", slipController.get);
 router.get("/list-article", articleController.get);
+router.get("/list-bet", betController.get);
 
 module.exports = router; // export to use in server.js

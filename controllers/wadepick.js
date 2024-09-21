@@ -4,7 +4,12 @@ require("dotenv").config();
 const conn = require("../services/db");
 
 exports.get = (req, res) => {
-  let sqlQuery = "SELECT * FROM  wade_picks";
+  // Modified SQL query to join wade_picks with week table to get week_name
+  let sqlQuery = `
+    SELECT wp.*, w.week_name 
+    FROM wade_picks wp
+    INNER JOIN week w ON wp.week_id = w.id
+  `;
 
   conn.query(sqlQuery, (err, result) => {
     if (err) {

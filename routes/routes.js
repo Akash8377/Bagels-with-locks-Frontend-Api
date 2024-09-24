@@ -11,11 +11,15 @@ const liveController = require("../controllers/adamlive");
 const futureController = require("../controllers/adamfuture");
 const slipController = require("../controllers/adamslip");
 const articleController = require("../controllers/article");
-const betController = require("../controllers/waderecord")
+const betController = require("../controllers/waderecord");
+const userEmail= require("../controllers/useremail");
+const totalWinController= require("../controllers/totalWin");
+const recapController = require("../controllers/adamrecap")
 const {
   loginUpValidataion,
   signUpValidation,
   forgetPasswordUpValidataion,
+  userEmailValidataion,
   gridValidataion,
   topValidataion
 } = require("../helper/validation");
@@ -57,5 +61,12 @@ router.get("/list-future", futureController.get);
 router.get("/list-slip", slipController.get);
 router.get("/list-article", articleController.get);
 router.get("/list-bet", betController.get);
+router.get("/list-win", totalWinController.get);
+router.get("/list-recap", recapController.get);
+router.post(
+  "/add-user-email",
+  userEmailValidataion,
+  userEmail.register
+);
 
 module.exports = router; // export to use in server.js

@@ -34,3 +34,6 @@ exports.topValidataion = [
   check("home_team", "Home Team is required").not().isEmpty(),
   check("away_team", "Away Team is required").not().isEmpty(),
 ];
+exports.userEmailValidataion = [
+  check("user_mail_name", "Email is required").not().isEmpty(),
+];

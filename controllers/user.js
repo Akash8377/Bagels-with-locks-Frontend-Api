@@ -46,6 +46,8 @@ exports.register = (req, res) => {
             const user = {
               first_name: req.body.first_name,
               last_name: req.body.last_name,
+              phoneno:req.body.phoneno,
+              promo_code:req.body.promo_code,
               email: email,
               password: hash,
               created_at: date_time,

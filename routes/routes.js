@@ -14,17 +14,20 @@ const articleController = require("../controllers/article");
 const betController = require("../controllers/waderecord");
 const userEmail= require("../controllers/useremail");
 const totalWinController= require("../controllers/totalWin");
-const recapController = require("../controllers/adamrecap")
+const recapController = require("../controllers/adamrecap");
+const contactUs = require("../controllers/contactus");
+const { createPaymentIntent } = require("../controllers/paymentController");
 const {
   loginUpValidataion,
   signUpValidation,
   forgetPasswordUpValidataion,
   userEmailValidataion,
-  gridValidataion,
+  contactValidation,
   topValidataion
 } = require("../helper/validation");
 
 // User Auth route
+router.post("/charge", createPaymentIntent);
 router.post("/register", signUpValidation, userController.register);
 router.post("/login", loginUpValidataion, userController.getUserLogin);
 router.get("/welcome", auth.verifyToken, userController.welcome);
@@ -68,5 +71,18 @@ router.post(
   userEmailValidataion,
   userEmail.register
 );
+
+//contact us-----------
+
+router.post(
+  "/add-contact",
+  contactValidation,
+  contactUs.register
+);
+router.get("/list-contact", auth.verifyToken, contactUs.get);
+router.get("/edit-contact/:id",  contactUs.edit);
+
+router.delete("/delete-contact/:id",  contactUs.delete);
+router.put("/status-contact/:id",  contactUs.status);
 
 module.exports = router; // export to use in server.js

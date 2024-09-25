@@ -1,6 +1,7 @@
 const express = require("express");
 const routes = require("./routes/routes");
 const webRoutes = require("./routes/webRoutes");
+const paymentRoutes = require("./routes/paymentRoutes"); // Add Stripe payment route
 const bodyParser = require("body-parser");
 const morgan = require("morgan");
 const AppError = require("./utils/appError");
@@ -9,7 +10,6 @@ const path = require("path");
 require("dotenv").config();
 const cors = require("cors");
 const session = require("express-session");
-const stripe = require("stripe")(process.env.STRIPE_SECRET_KEY); // Add Stripe secret key
 
 const app = express();
 
@@ -30,11 +30,13 @@ app.use(
 );
 
 // CORS configuration
-app.use(cors({
-  origin: "*",  // Update this to your frontend domain for better security
-  methods: "GET,HEAD,PUT,PATCH,POST,DELETE",
-  credentials: true,
-}));
+app.use(
+  cors({
+    origin: "*", // Set this to your frontend domain
+    methods: "GET,HEAD,PUT,PATCH,POST,DELETE",
+    credentials: true,
+  })
+);
 
 // Body parser middleware
 app.use(express.json());
@@ -44,30 +46,10 @@ app.use(express.urlencoded({ extended: true }));
 // Logger middleware
 app.use(morgan("tiny"));
 
-// Stripe payment route
-app.post("/create-payment-intent", async (req, res, next) => {
-  try {
-    const { amount } = req.body;
-
-    // Create a PaymentIntent with the order amount and currency
-    const paymentIntent = await stripe.paymentIntents.create({
-      amount: Math.round(amount * 100), // Stripe works with the smallest currency unit
-      currency: "usd", // Change this to match your preferred currency
-      payment_method_types: ["card"], // Payment methods, can be expanded to more
-    });
-
-    // Send client secret to the frontend
-    res.send({
-      clientSecret: paymentIntent.client_secret,
-    });
-  } catch (error) {
-    next(new AppError(error.message, 500));
-  }
-});
-
 // Routes
 app.use("/", routes);
 app.use("/", webRoutes);
+app.use("/api", paymentRoutes); // Add Stripe API route here
 
 // Handle undefined routes (404)
 app.all("*", (req, res, next) => {
@@ -82,7 +64,7 @@ const hostname = process.env.HOST || "0.0.0.0"; // Listen on all network interfa
 const port = process.env.PORT || 9000;
 
 app.listen(port, hostname, () => {
-  console.log(`Server running on https://${hostname}:${port}`);
+  console.log(`Server running on http://${hostname}:${port}`);
 });
 
 module.exports = app;

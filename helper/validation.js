@@ -37,3 +37,10 @@ exports.topValidataion = [
 exports.userEmailValidataion = [
   check("user_mail_name", "Email is required").not().isEmpty(),
 ];
+exports.contactValidation = [
+  check("first_name", "First Name is required").not().isEmpty(),
+  check("last_name", "Last Name is required").not().isEmpty(),
+  check("email", "Email is required").not().isEmpty(),
+  check("phoneno", "Phone Number is required").not().isEmpty(),
+  check("message", "Message is required").not().isEmpty(),
+];

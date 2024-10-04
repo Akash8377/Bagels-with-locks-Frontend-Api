@@ -15,7 +15,9 @@ const betController = require("../controllers/waderecord");
 const userEmail= require("../controllers/useremail");
 const totalWinController= require("../controllers/totalWin");
 const recapController = require("../controllers/adamrecap");
+const membership = require("../controllers/membership")
 const contactUs = require("../controllers/contactus");
+const promocode = require("../controllers/promocode")
 const { createPaymentIntent } = require("../controllers/paymentController");
 const {
   loginUpValidataion,
@@ -46,6 +48,11 @@ router.post(
 router.get("/reset-password", userController.reset_password);
 router.post("/reset-password", userController.reset_password_update);
 
+//check user membership
+router.get("/membership", membership.get);
+
+//check for promocode
+router.post("/promocode", promocode.post);
 // Ensure userController.logout is defined
 router.post("/logout", userController.logout);
 

@@ -36,12 +36,11 @@ exports.register = (req, res) => {
     remove: /[*+~%\<>/;.(){}?,'"!:@#^|]/g, // remove special characters
   });
   var date_time = new Date();
-  const sqlQuery = `INSERT INTO contact_us (first_name,last_name,email,phoneno,message,created_at, updated_at) VALUES (?,?, ?, ?, ?, ?,?)`;
+  const sqlQuery = `INSERT INTO contact_us (first_name,last_name,email,message,created_at, updated_at) VALUES (?, ?, ?, ?, ?,?)`;
   const values = [
     req.body.first_name,
     req.body.last_name,
     req.body.email,
-    req.body.phoneno,
     req.body.message,
     date_time,
     date_time,

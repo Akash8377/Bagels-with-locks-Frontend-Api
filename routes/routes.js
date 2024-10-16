@@ -17,8 +17,11 @@ const totalWinController= require("../controllers/totalWin");
 const recapController = require("../controllers/adamrecap");
 const membership = require("../controllers/membership")
 const contactUs = require("../controllers/contactus");
-const promocode = require("../controllers/promocode")
+const promocode = require("../controllers/promocode");
+const podcastController = require("../controllers/podcast");
+const pollRoutes = require("../controllers/pollController")
 const { createPaymentIntent } = require("../controllers/paymentController");
+
 const {
   loginUpValidataion,
   signUpValidation,
@@ -67,6 +70,7 @@ router.get("/list-top", topController.get);
 router.get("/list-pick", pickController.get);
 
 router.get("/list-live", liveController.get);
+router.get("/list-podcast", podcastController.get);
 router.get("/list-future", futureController.get);
 router.get("/list-slip", slipController.get);
 router.get("/list-article", articleController.get);
@@ -92,4 +96,9 @@ router.get("/edit-contact/:id",  contactUs.edit);
 router.delete("/delete-contact/:id",  contactUs.delete);
 router.put("/status-contact/:id",  contactUs.status);
 
-module.exports = router; // export to use in server.js
+router.get('/get-teams', pollRoutes.getTeams);
+router.post('/submit-selection/:id', pollRoutes.submitSelection);
+router.get('/user-selections/:userId', pollRoutes.fetchUserSelections);
+router.get('/user-leaderboard', pollRoutes.fetchLeaderboard)
+
+module.exports = router; 

@@ -5,7 +5,9 @@ const conn = require('../services/db')
 const jwt = require('jsonwebtoken')
 
 router.post('/charge', async (req, res) => {
+
   const { tierName, amount, paymentMethodId, returnUrl } = req.body; // Use paymentMethodId
+
 
   try {
     const authHeader = req.headers.authorization;
@@ -37,8 +39,11 @@ router.post('/charge', async (req, res) => {
     });
 
     // Store paymentMethodId in the payment_intent_id column instead of paymentIntent.id
+
     const sqlQuery = `INSERT INTO payments (user_id, name, email, phone, tierName, amount, payment_intent_id) VALUES (?, ?, ?, ?, ?, ?, ?)`;
     const values = [userId, customerName, customerEmail, customerPhone, tierName, amount, paymentMethodId]; // Use paymentMethodId here
+
+
 
     conn.query(sqlQuery, values, (err) => {
       if (err) {

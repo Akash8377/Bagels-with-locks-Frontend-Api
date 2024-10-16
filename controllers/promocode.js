@@ -1,4 +1,3 @@
-
 const AppError = require("../utils/appError");
 const { validationResult } = require("express-validator");
 require("dotenv").config();

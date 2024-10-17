@@ -5,7 +5,7 @@ const conn = require("../services/db");
 
 exports.get = (req, res) => {
 
-  let sqlQuery = "SELECT user_id, name, amount, tierName FROM payments";
+  let sqlQuery = "SELECT user_id, name, amount, tierName ,created_at FROM payments";
 //   SELECT * FROM memberships WHERE user_id = ?;
 
   conn.query(sqlQuery, (err, result) => {

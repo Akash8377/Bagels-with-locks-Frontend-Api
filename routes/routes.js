@@ -2,6 +2,8 @@ const express = require("express");
 const router = express.Router();
 const auth = require("../middleware/auth");
 const userController = require("../controllers/user");
+const { uploadUserImage, updateUserImage } = require('../controllers/uploadProfile');
+
 const fileController = require("../controllers/file.controller");
 const regestationController = require("../controllers/regestation");
 const gridController = require("../controllers/grid");
@@ -19,6 +21,7 @@ const membership = require("../controllers/membership")
 const contactUs = require("../controllers/contactus");
 const promocode = require("../controllers/promocode");
 const podcastController = require("../controllers/podcast");
+const pollRoutes = require("../controllers/pollController")
 const { createPaymentIntent } = require("../controllers/paymentController");
 
 const {
@@ -35,7 +38,7 @@ router.post("/charge", createPaymentIntent);
 router.post("/register", signUpValidation, userController.register);
 router.post("/login", loginUpValidataion, userController.getUserLogin);
 router.get("/welcome", auth.verifyToken, userController.welcome);
-router.post("/profile/update", auth.verifyToken, userController.update_profile);
+router.put('/users/:id/image', uploadUserImage, updateUserImage);
 router.post(
   "/profile/change-password",
   auth.verifyToken,
@@ -94,5 +97,10 @@ router.get("/edit-contact/:id",  contactUs.edit);
 
 router.delete("/delete-contact/:id",  contactUs.delete);
 router.put("/status-contact/:id",  contactUs.status);
+
+router.get('/get-teams', pollRoutes.getTeams);
+router.post('/submit-selection/:id', pollRoutes.submitSelection);
+router.get('/user-selections/:userId', pollRoutes.fetchUserSelections);
+router.get('/user-leaderboard', pollRoutes.fetchLeaderboard)
 
 module.exports = router; 

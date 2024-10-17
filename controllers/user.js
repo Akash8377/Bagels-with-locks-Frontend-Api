@@ -9,6 +9,20 @@ const jwt = require("jsonwebtoken");
 const ejs = require("ejs");
 const fs = require("fs/promises");
 const token_key = process.env.TOKEN_KEY;
+const multer = require('multer');
+const path = require('path');
+
+// Set up multer for image uploads
+const storage = multer.diskStorage({
+  destination: function (req, file, cb) {
+    cb(null, 'uploads/'); // Directory where images will be stored
+  },
+  filename: function (req, file, cb) {
+    cb(null, Date.now() + path.extname(file.originalname)); // Unique file name
+  },
+});
+
+const upload = multer({ storage: storage });
 
 // User Register
 
@@ -348,42 +362,7 @@ exports.reset_password_update = (req, res) => {
   });
 };
 
-exports.update_profile = (req, res) => {
-  const errors = validationResult(req);
-  if (!errors.isEmpty()) {
-    return res.status(400).json({ errors: errors.array() });
-  }
-  const authToken = req.headers.authorization.split(" ")[1];
-  const decode = jwt.verify(authToken, token_key);
-  user_id = decode.id;
-  var date_time = new Date();
-  const sqlQuery = `UPDATE users SET first_name = ?,last_name = ?,country = ?,state = ?,city = ?,zip = ?,address = ?,email = ?,phoneno = ?,updated_at=? WHERE id = ?;`;
-  const values = [
-    req.body.first_name,
-    req.body.last_name,
-    req.body.country,
-    req.body.state,
-    req.body.city,
-    req.body.zip,
-    req.body.address,
-    req.body.email,
-    req.body.phoneno,
-    date_time,
-    user_id,
-  ];
-  conn.query(sqlQuery, values, (err, result) => {
-    if (err) {
-      return res.status(500).send({
-        msg: err,
-      });
-    } else {
-      res.status(200).send({
-        status: "success",
-        msg: "Profile update successful",
-      });
-    }
-  });
-};
+
 exports.update_password = (req, res) => {
   // Ensure required fields exist in the request
   if (

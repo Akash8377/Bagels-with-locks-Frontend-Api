@@ -9,6 +9,8 @@ const jwt = require("jsonwebtoken");
 const ejs = require("ejs");
 const fs = require("fs/promises");
 const token_key = process.env.TOKEN_KEY;
+const multer = require('multer');
+const path = require('path');
 
 // User Register
 
@@ -50,6 +52,7 @@ exports.register = (req, res) => {
               promo_code:req.body.promo_code,
               email: email,
               password: hash,
+              image:null,
               created_at: date_time,
               updated_at: date_time,
             };
@@ -384,6 +387,59 @@ exports.update_profile = (req, res) => {
     }
   });
 };
+
+//image upload in database
+const storage = multer.diskStorage({
+  destination: (req, file, cb) => {
+    cb(null, './public/uploads'); // Directory for storing uploaded files
+  },
+  filename: (req, file, cb) => {
+    const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1E9);
+    cb(null, uniqueSuffix + path.extname(file.originalname)); // Preserve the file extension
+  }
+});
+
+const upload = multer({ storage: storage });
+
+
+// New API to update user image
+exports.update_user_image = [upload.single('image'), (req, res) => {
+  const authToken = req.headers.authorization.split(" ")[1];
+  
+  // Validate the JWT token
+  const decode = jwt.verify(authToken, token_key);
+  const user_id = decode.id;
+
+  // Check if a new user image was uploaded
+ 
+  if (!req.file.originalname.match(/\.(jpg|JPG|jpeg|JPEG|png|PNG|gif|GIF)$/)) {
+    res.send({ msg:'Only image files (jpg, jpeg, png) are allowed!'})};
+
+    const image = req.file.filename;
+  // Prepare the SQL query to update the user image
+  const sqlQuery = `UPDATE users SET image = ? WHERE id = ?;`;
+  const values = [
+      image,
+      user_id, // The user ID
+  ];
+
+  // Execute the SQL query to update the image
+  conn.query(sqlQuery, values, (err, result) => {
+      if (err) {
+          console.error('Database error:', err); // Log the error for debugging
+          return res.status(500).send({
+              msg: err,
+          });
+      }
+
+      // Return success message after updating
+      res.status(200).send({
+          status: "success",
+          msg: "User image updated successfully",
+      });
+  });
+}];
+
 exports.update_password = (req, res) => {
   // Ensure required fields exist in the request
   if (

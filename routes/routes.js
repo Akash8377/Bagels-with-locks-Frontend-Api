@@ -37,6 +37,7 @@ router.post("/register", signUpValidation, userController.register);
 router.post("/login", loginUpValidataion, userController.getUserLogin);
 router.get("/welcome", auth.verifyToken, userController.welcome);
 router.post("/profile/update", auth.verifyToken, userController.update_profile);
+router.post("/user_image/update/:user_id", userController.update_user_image)
 router.post(
   "/profile/change-password",
   auth.verifyToken,
@@ -52,7 +53,7 @@ router.get("/reset-password", userController.reset_password);
 router.post("/reset-password", userController.reset_password_update);
 
 //check user membership
-router.get("/membership", membership.get);
+router.get("/membership/:user_id", membership.get);
 
 //check for promocode
 router.post("/promocode", promocode.post);

@@ -227,40 +227,89 @@ exports.submitSelection = async (req, res) => {
 
 // // to check user have selected team for this match previous
 
-exports.fetchUserSelections = (req, res) => {
-  const userId = req.params.userId; // Get user ID from URL params
+// exports.fetchUserSelections = (req, res) => {
+//   const userId = req.params.userId; // Get user ID from URL params
 
-  if (!userId) {
-      return res.status(400).json({
-          status: 'error',
-          message: 'User ID is required',
-      });
-  }
+//   if (!userId) {
+//       return res.status(400).json({
+//           status: 'error',
+//           message: 'User ID is required',
+//       });
+//   }
 
-  // Query to get all selections made by the user
-  const sqlQuery = `SELECT * FROM user_selections WHERE user_id = ?`;
+//   // Query to get all selections made by the user
+//   const sqlQuery = `SELECT * FROM user_selections WHERE user_id = ?`;
 
-  conn.query(sqlQuery, [userId], (err, results) => {
-      if (err) {
-          console.error('Database error:', err);
-          return res.status(500).json({
-              status: 'error',
-              message: 'Failed to retrieve user selections from the database',
-          });
-      }
+//   conn.query(sqlQuery, [userId], (err, results) => {
+//       if (err) {
+//           console.error('Database error:', err);
+//           return res.status(500).json({
+//               status: 'error',
+//               message: 'Failed to retrieve user selections from the database',
+//           });
+//       }
 
-      if (results.length === 0) {
-          return res.status(404).json({
-              status: 'error',
-              message: 'No selections found for this user',
-          });
-      }
+//       if (results.length === 0) {
+//           return res.status(404).json({
+//               status: 'error',
+//               message: 'No selections found for this user',
+//           });
+//       }
 
-      return res.status(200).json({
-          status: 'success',
-          data: results,
-      });
-  });
+//       return res.status(200).json({
+//           status: 'success',
+//           data: results,
+//       });
+//   });
+// };
+
+exports.fetchUserSelections = async (req, res) => {
+    const userId = req.params.userId; // Get user ID from URL params
+
+    if (!userId) {
+        return res.status(400).json({
+            status: 'error',
+            message: 'User ID is required',
+        });
+    }
+
+    // Get the current week using the provided function
+    const currentWeek = getCurrentWeek();
+
+    if (!currentWeek) {
+        return res.status(400).json({
+            status: 'error',
+            message: 'No active NFL week found for the current date.',
+        });
+    }
+
+    // Query to get all selections made by the user for the current week
+    const sqlQuery = `
+        SELECT * FROM user_selections 
+        WHERE user_id = ? AND week_id = ?
+    `;
+
+    conn.query(sqlQuery, [userId, currentWeek], (err, results) => {
+        if (err) {
+            console.error('Database error:', err);
+            return res.status(500).json({
+                status: 'error',
+                message: 'Failed to retrieve user selections from the database',
+            });
+        }
+
+        if (results.length === 0) {
+            return res.status(404).json({
+                status: 'error',
+                message: 'No selections found for this user in the current week',
+            });
+        }
+
+        return res.status(200).json({
+            status: 'success',
+            data: results,
+        });
+    });
 };
 
 

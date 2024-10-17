@@ -2,6 +2,8 @@ const express = require("express");
 const router = express.Router();
 const auth = require("../middleware/auth");
 const userController = require("../controllers/user");
+const { uploadUserImage, updateUserImage } = require('../controllers/uploadProfile');
+
 const fileController = require("../controllers/file.controller");
 const regestationController = require("../controllers/regestation");
 const gridController = require("../controllers/grid");

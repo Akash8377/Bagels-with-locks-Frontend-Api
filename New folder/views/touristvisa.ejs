@@ -1,0 +1,238 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+    <meta content="width=device-width, initial-scale=1" name="viewport" />
+    <title>Email verify</title>
+    <style type="text/css">
+      @import url("https://fonts.googleapis.com/css2?family=Condiment&family=Poppins:wght@100;200;300;400;500;600;700;800;900&display=swap");
+
+      html {
+        width: 100%;
+      }
+      body {
+        background-color: #fff;
+        margin: 0;
+        padding: 0;
+        color: #000000;
+        font-family: "Poppins", sans-serif;
+      }
+
+      table {
+        border-collapse: collapse;
+      }
+
+      table th,
+      table td {
+        padding: 10px;
+        font-size: 14px;
+        font-weight: 500;
+        color: #000;
+      }
+
+      a {
+        text-decoration: none !important;
+      }
+      @media only screen and (max-width: 600px) {
+        table {
+          width: 100% !important;
+          margin: 0 auto !important;
+        }
+      }
+    </style>
+  </head>
+
+  <body>
+    <table
+      style="padding: 0; margin: 0"
+      border="0"
+      width="100%"
+      cellspacing="0"
+      cellpadding="0"
+      align="center"
+      bgcolor="#ffffff"
+    >
+      <tbody>
+        <tr>
+          <td align="center" bgcolor="#ffffff" bgcolor="#ffffff">
+            <table
+              border="0"
+              width="600"
+              cellspacing="0"
+              cellpadding="0"
+              bgcolor="#ffffff"
+            >
+              <tbody>
+                <tr>
+                  <td style="padding: 0px">
+                    <table
+                      border="0"
+                      width="100%"
+                      cellspacing="0"
+                      cellpadding="0"
+                      bgcolor="#ffffff"
+                    >
+                      <tbody>
+                        <tr>
+                          <td>
+                            <table
+                              width="100%"
+                              cellspacing="0"
+                              cellpadding="0"
+                              bgcolor="#ffffff"
+                            >
+                              <tbody>
+                                <tr>
+                                  <td align="left">
+                                    <a href="index.html">
+                                      <img
+                                        src="http://127.0.0.1:9900/image/innerlogo.svg"
+                                        alt=""
+                                        style="max-width: 150px"
+                                      />
+                                    </a>
+                                  </td>
+                                  <td align="right">
+                                    <a href="tel:+18006590187">
+                                      <img
+                                        src="http://127.0.0.1:9900/image/callnum.png"
+                                        alt=""
+                                        style="max-width: 140px"
+                                      />
+                                    </a>
+                                  </td>
+                                </tr>
+                              </tbody>
+                            </table>
+                          </td>
+                        </tr>
+                        <tr>
+                          <td>
+                            <table
+                              width="100%"
+                              cellspacing="0"
+                              cellpadding="0"
+                              bgcolor="#ffffff"
+                            >
+                              <tbody>
+                                <tr>
+                                  <td
+                                    style="border-bottom: 1px solid #dadada"
+                                  ></td>
+                                </tr>
+                              </tbody>
+                            </table>
+                          </td>
+                        </tr>
+
+                        <tr>
+                          <table
+                            width="100%"
+                            cellspacing="0"
+                            cellpadding="0"
+                            bgcolor="#ffffff"
+                            align="left"
+                          >
+                            <tr>
+                              <th align="left"><b>Name</b></th>
+                              <th align="left"><%= name %></th>
+                            </tr>
+                            <tr>
+                              <td align="left"><b>Email</b></td>
+                              <td align="left"><%= email %></td>
+                            </tr>
+                            <tr>
+                              <td align="left"><b>Country Code</b></td>
+                              <td align="left"><%= country %></td>
+                            </tr>
+                            <tr>
+                              <td align="left"><b>Cell No</b></td>
+                              <td align="left"><%= cell_no %></td>
+                            </tr>
+                            <tr>
+                              <td align="left"><b>Nationality</b></td>
+                              <td align="left"><%= nationality %></td>
+                            </tr>
+                            <tr>
+                              <td align="left"><b>Arrival Date</b></td>
+                              <td align="left"><%= arrival_date %></td>
+                            </tr>
+                            <tr>
+                              <td align="left"><b>Departure Date</b></td>
+                              <td align="left"><%= departure_date %></td>
+                            </tr>
+                            <tr>
+                              <td align="left"><b>No of People</b></td>
+                              <td align="left"><%= no_of_people %></td>
+                            </tr>
+                            <tr>
+                              <td align="left">
+                                <b>How Did You Discover Us</b>
+                              </td>
+                              <td align="left">
+                                <%= how_did_you_discover_us %>
+                              </td>
+                            </tr>
+                          </table>
+                        </tr>
+
+                        <tr>
+                          <td style="padding-top: 30px">
+                            <table
+                              border="0"
+                              width="100%"
+                              cellspacing="0"
+                              cellpadding="0"
+                              bgcolor="#ffffff"
+                            >
+                              <tbody>
+                                <tr>
+                                  <td>
+                                    <div
+                                      style="
+                                        border-top: 1px solid #dadada;
+                                        padding-top: 30px;
+                                        padding-bottom: 10px;
+                                        text-align: center;
+                                      "
+                                    >
+                                      <a href="#"
+                                        ><img
+                                          src="http://127.0.0.1:9900/image/fbicon.png"
+                                          alt=""
+                                          width="35" /></a
+                                      >&nbsp;&nbsp;&nbsp;<a href="#"
+                                        ><img
+                                          src="http://127.0.0.1:9900/image/twicon.png"
+                                          alt=""
+                                          width="35" /></a
+                                      >&nbsp;&nbsp;&nbsp;<a href="#"
+                                        ><img
+                                          src="http://127.0.0.1:9900/image/yticon.png"
+                                          alt=""
+                                          width="35" /></a
+                                      >&nbsp;&nbsp;&nbsp;<a href="#"
+                                        ><img
+                                          src="http://127.0.0.1:9900/image/igicon.png"
+                                          alt=""
+                                          width="35"
+                                      /></a>
+                                    </div>
+                                  </td>
+                                </tr>
+                              </tbody>
+                            </table>
+                          </td>
+                        </tr>
+                      </tbody>
+                    </table>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </body>
+</html>

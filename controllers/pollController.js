@@ -392,3 +392,118 @@ exports.fetchLeaderboard = (req, res) =>{
         });
     });
 }
+
+
+// exports.submitSelection = async (req, res) => {
+//     const matchId = req.params.id;
+//     const { selectedTeam, userId, match_date, username, email, phone } = req.body; // Retrieve selected team and user details from the body
+
+//     // Validate inputs
+//     if (!matchId || !selectedTeam || !userId || !match_date || !username || !email || !phone) {
+//         return res.status(400).json({
+//             status: 'error',
+//             message: 'Match ID, selected team, user ID, match date, username, email, and phone are required',
+//         });
+//     }
+
+//     // Get the current week based on the match date
+//     const weekId = getWeekIdFromDate(match_date); // You can implement this function to map match_date to week_id
+
+//     if (!weekId) {
+//         return res.status(400).json({
+//             status: 'error',
+//             message: 'No active NFL week found for the provided match date.',
+//         });
+//     }
+
+//     // Check if the user has already selected a team in the current week
+//     const checkCurrentWeekQuery = `
+//         SELECT * FROM user_selections 
+//         WHERE user_id = ? AND week_id = ?
+//     `;
+
+//     conn.query(checkCurrentWeekQuery, [userId, weekId], (err, currentWeekSelections) => {
+//         if (err) {
+//             console.error('Database error:', err);
+//             return res.status(500).json({
+//                 status: 'error',
+//                 message: 'Failed to check user selections for the current week',
+//             });
+//         }
+
+//         if (currentWeekSelections.length > 0) {
+//             return res.status(400).json({
+//                 status: 'error',
+//                 message: 'You have already selected a team for this week.',
+//             });
+//         }
+
+//         // Check the user's last result
+//         const checkLastSelectionQuery = `
+//             SELECT selected_team, result, week_id FROM user_selections 
+//             WHERE user_id = ? 
+//             ORDER BY match_date DESC LIMIT 1
+//         `;
+
+//         conn.query(checkLastSelectionQuery, [userId], (err, lastResults) => {
+//             if (err) {
+//                 console.error('Database error:', err);
+//                 return res.status(500).json({
+//                     status: 'error',
+//                     message: 'Failed to check user selection',
+//                 });
+//             }
+
+//             if (lastResults.length > 0) {
+//                 const lastResult = lastResults[0].result;
+
+//                 // If the last result was a loss (1), the user is out of the pool
+//                 if (lastResult === 1) {
+//                     return res.status(400).json({
+//                         status: 'error',
+//                         message: 'You have been eliminated from the pool due to your last team result (loss).',
+//                     });
+//                 }
+
+//                 // If the last result was a tie (2) or win (3), they can select a team, but not the same team
+//                 if (lastResult === 2 || lastResult === 3) {
+//                     if (lastResults[0].selected_team === selectedTeam) {
+//                         return res.status(400).json({
+//                             status: 'error',
+//                             message: 'You cannot select the same team again for a new match after a tie or win.',
+//                         });
+//                     }
+
+//                     // Ensure the user selects only for the next week
+//                     if (lastResults[0].week_id >= weekId) {
+//                         return res.status(400).json({
+//                             status: 'error',
+//                             message: 'You can only select a team for the next week.',
+//                         });
+//                     }
+//                 }
+//             }
+
+//             // No issues, proceed to insert the new selection
+//             const insertSelectionQuery = `
+//                 INSERT INTO user_selections (match_id, selected_team, user_id, match_date, username, email, phone, week_id) 
+//                 VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+//             `;
+
+//             conn.query(insertSelectionQuery, [matchId, selectedTeam, userId, match_date, username, email, phone, weekId], (err, result) => {
+//                 if (err) {
+//                     console.error('Database error:', err);
+//                     return res.status(500).json({
+//                         status: 'error',
+//                         message: 'Failed to save selection to the database',
+//                     });
+//                 }
+
+//                 return res.status(200).json({
+//                     status: 'success',
+//                     message: 'Selection submitted successfully!',
+//                 });
+//             });
+//         });
+//     });
+// };

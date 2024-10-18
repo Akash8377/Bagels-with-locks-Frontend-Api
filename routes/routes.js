@@ -100,6 +100,7 @@ router.delete("/delete-contact/:id",  contactUs.delete);
 router.put("/status-contact/:id",  contactUs.status);
 
 router.get('/get-teams', pollRoutes.getTeams);
+router.get('/get-matches', pollRoutes.getTeams);
 router.post('/submit-selection/:id', pollRoutes.submitSelection);
 router.get('/user-selections/:userId', pollRoutes.fetchUserSelections);
 // router.get('/user-selections/:userId/:week_id', pollRoutes.fetchUserSelections);

@@ -102,6 +102,7 @@ router.put("/status-contact/:id",  contactUs.status);
 router.get('/get-teams', pollRoutes.getTeams);
 router.post('/submit-selection/:id', pollRoutes.submitSelection);
 router.get('/user-selections/:userId', pollRoutes.fetchUserSelections);
+// router.get('/user-selections/:userId/:week_id', pollRoutes.fetchUserSelections);
 router.get('/user-leaderboard', pollRoutes.fetchLeaderboard)
 
 module.exports = router; 

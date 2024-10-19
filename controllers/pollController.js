@@ -127,10 +127,8 @@ function getCurrentWeek() {
 
 exports.submitSelection = async (req, res) => {
   const matchId = req.params.id; 
-  const { selectedTeam, userId, match_date, username, email, phone, timezone = 'default' } = req.body;// Retrieve selected team and user details from the body
-  const selectedTimezone = timezones[timezone] || timezones['default'];
+  const { selectedTeam, userId, match_date, username, email, phone } = req.body; // Retrieve selected team and user details from the body
 
-  const formattedMatchDate = formatDateForTimezone(new Date(match_date), selectedTimezone);
   // Validate inputs
   if (!matchId || !selectedTeam || !userId || !match_date || !username || !email || !phone) {
       return res.status(400).json({
@@ -160,7 +158,7 @@ exports.submitSelection = async (req, res) => {
       WHERE user_id = ? AND match_date >= ?
   `;
 
-  conn.query(sqlQuery, [matchId, selectedTeam, userId, formattedMatchDate, username, email, phone, currentWeek], (err, result) => {
+  conn.query(checkRecentSelectionQuery, [userId, weekAgo], (err, recentResults) => {
       if (err) {
           console.error('Database error:', err);
           return res.status(500).json({

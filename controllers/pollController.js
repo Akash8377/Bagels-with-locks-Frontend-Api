@@ -48,43 +48,58 @@ function formatDateForTimezone(date, timezone) {
 }
 exports.getTeams = async (req, res, next) => {
     try {
-        const { timezone = 'default' } = req.query;  // Fetch timezone from query params, default to UTC if not provided
-        const selectedTimezone = timezones[timezone] || timezones['default'];
-      const apiKey = process.env.ODDS_API_KEY; // Store API key in environment variables for security
-      const apiUrl = `https://api.the-odds-api.com/v4/sports/americanfootball_nfl/odds?regions=us&markets=h2h,spreads,totals&oddsFormat=american&apiKey=${apiKey}`;
-  
-      // Making the API request
-      const response = await axios.get(apiUrl);
-  
-      const matches = response.data.map(match => {
-        const matchDate =  new Date(match.commence_time).toLocaleString()
-       // const dayOfWeek = matchDate.toLocaleDateString( { weekday: 'long' });
-       const formattedDate = formatDateForTimezone(matchDate, selectedTimezone);
-        //const formattedTime = matchDate;
-  
-        // Getting odds for each team
-        const homeTeamOdds = match.bookmakers[0]?.markets[0]?.outcomes?.find(outcome => outcome.name === match.home_team)?.price || 'N/A';
-        const awayTeamOdds = match.bookmakers[0]?.markets[0]?.outcomes?.find(outcome => outcome.name === match.away_team)?.price || 'N/A';
-  
-        return {
-          id: match.id,
-          home_team: match.home_team,
-          away_team: match.away_team,
-          commence_time:match.commence_time,
-          match_date: formattedDate,
-          //match_time: formattedTime,
-          // match_day: dayOfWeek,
-          home_team_odds: homeTeamOdds, // Include odds data for home team
-          away_team_odds: awayTeamOdds, // Include odds data for away team
-        };
-      });
-  
-      res.status(200).json(matches);
+        const apiKey = process.env.ODDS_API_KEY;
+        const apiUrl = `https://api.the-odds-api.com/v4/sports/americanfootball_nfl/odds?regions=us&markets=h2h,spreads,totals&oddsFormat=american&apiKey=${apiKey}`;
+
+        // Making the API request
+        const response = await axios.get(apiUrl);
+
+        const matches = response.data.map(match => {
+            let matchDate = null;
+            if (match.commence_time) {
+                try {
+                    // Convert the commence_time to a valid Date object
+                    matchDate = new Date(match.commence_time * 1000); // assuming the API returns Unix timestamp in seconds
+                    if (isNaN(matchDate)) {
+                        throw new Error("Invalid commence_time value");
+                    }
+                } catch (error) {
+                    console.error('Error parsing commence_time:', error);
+                    matchDate = null;
+                }
+            }
+
+            // Format the match date for different time zones
+            const formattedDates = {};
+            for (const [location, timeZone] of Object.entries(timeZones)) {
+                if (matchDate) {
+                    formattedDates[location] = format(matchDate, "yyyy-MM-dd HH:mm:ssXXX", { timeZone });
+                } else {
+                    formattedDates[location] = "N/A"; // Handle invalid dates
+                }
+            }
+
+            // Getting odds for each team
+            const homeTeamOdds = match.bookmakers[0]?.markets[0]?.outcomes?.find(outcome => outcome.name === match.home_team)?.price || 'N/A';
+            const awayTeamOdds = match.bookmakers[0]?.markets[0]?.outcomes?.find(outcome => outcome.name === match.away_team)?.price || 'N/A';
+
+            return {
+                id: match.id,
+                home_team: match.home_team,
+                away_team: match.away_team,
+                commence_time: match.commence_time,
+                match_date: formattedDates, // Include formatted dates for different time zones
+                home_team_odds: homeTeamOdds, // Include odds data for home team
+                away_team_odds: awayTeamOdds, // Include odds data for away team
+            };
+        });
+
+        res.status(200).json(matches);
     } catch (error) {
-      console.error('Error fetching teams:', error.message);
-      next(new AppError('Failed to fetch teams', 500));
+        console.error('Error fetching teams:', error.message);
+        next(new AppError('Failed to fetch teams', 500));
     }
-  };
+};
 
 function getCurrentWeek() {
   const today = new Date();  // Get today's date and time

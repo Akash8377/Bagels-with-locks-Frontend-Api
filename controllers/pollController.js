@@ -6,12 +6,7 @@ const conn = require("../services/db");
 const axios = require('axios');
 
 const apiKey = process.env.ODDS_API_KEY; // Store API key in .env file
-const timeZones = {
-  "India": "Asia/Kolkata",
-  "USA": "America/New_York", // New York Time
-  "Brazil": "America/Sao_Paulo",
-  // Add more time zones as needed
-};
+
 
 const nflWeeks = [
   { week: '1', startDate: '2024-09-05', endDate: '2024-09-11' },
@@ -34,94 +29,53 @@ const nflWeeks = [
   { week: '18', startDate: '2025-01-02', endDate: '2025-01-05' }
 ];
 
-exports.getTeams = async (req, res, next) => {
-    try {
-      const apiKey = process.env.ODDS_API_KEY; // Store API key in environment variables for security
-      const apiUrl = `https://api.the-odds-api.com/v4/sports/americanfootball_nfl/odds?regions=us&markets=h2h,spreads,totals&oddsFormat=american&apiKey=${apiKey}`;
-  
-      // Making the API request
-      const response = await axios.get(apiUrl);
-  
-      // Log the API response to inspect structure
-      // console.log(response.data);
-  
-      const matches = response.data.map(match => {
-        const matchDate =  new Date(match.commence_time).toLocaleString()
-       // const dayOfWeek = matchDate.toLocaleDateString( { weekday: 'long' });
-        const formattedDate = matchDate;
-        //const formattedTime = matchDate;
-  
-        // Getting odds for each team
-        const homeTeamOdds = match.bookmakers[0]?.markets[0]?.outcomes?.find(outcome => outcome.name === match.home_team)?.price || 'N/A';
-        const awayTeamOdds = match.bookmakers[0]?.markets[0]?.outcomes?.find(outcome => outcome.name === match.away_team)?.price || 'N/A';
-  
-        return {
-          id: match.id,
-          home_team: match.home_team,
-          away_team: match.away_team,
-          commence_time:match.commence_time,
-          match_date: formattedDate,
-          //match_time: formattedTime,
-          // match_day: dayOfWeek,
-          home_team_odds: homeTeamOdds, // Include odds data for home team
-          away_team_odds: awayTeamOdds, // Include odds data for away team
-        };
-      });
-  
-      res.status(200).json(matches);
-    } catch (error) {
-      console.error('Error fetching teams:', error.message);
-      next(new AppError('Failed to fetch teams', 500));
-    }
-  };
-
 // Get home and away teams from Odds API
-// exports.getTeams = async (req, res, next) => {
-//   try {
-//       const sport = 'americanfootball_nfl'; // Example sport
-//       const region = 'us'; // Example region
-//       const markets = 'h2h'; // Head-to-head market for win/loss odds
+exports.getTeams = async (req, res, next) => {
+  try {
+      const sport = 'americanfootball_nfl'; // Example sport
+      const region = 'us'; // Example region
+      const markets = 'h2h'; // Head-to-head market for win/loss odds
 
-//       const response = await axios.get(`https://api.the-odds-api.com/v4/sports/${sport}/odds`, {
-//           params: {
-//               apiKey: apiKey,
-//               regions: region,
-//               markets: markets,
-//           },
-//       });
+      const response = await axios.get(`https://api.the-odds-api.com/v4/sports/${sport}/odds`, {
+          params: {
+              apiKey: apiKey,
+              regions: region,
+              markets: markets,
+          },
+      });
 
-//       // Log the API response to check the structure
-//       //console.log(response.data);
+      // Log the API response to check the structure
+      //console.log(response.data);
 
-//       const matches = response.data.map(match => {
-//           // Get match date and time
-//           const matchDate = new Date(match.commence_time);
-//           const dayOfWeek = matchDate.toLocaleDateString('en-US', { weekday: 'long' });
-//           const formattedDate = matchDate.toLocaleDateString('en-US'); // Date in MM/DD/YYYY format
-//           const formattedTime = matchDate.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' });
+      const matches = response.data.map(match => {
+          // Get match date and time
+          const matchDate = new Date(match.commence_time);
+          const dayOfWeek = matchDate.toLocaleDateString('en-US', { weekday: 'long' });
+          const formattedDate = matchDate.toLocaleDateString('en-US'); // Date in MM/DD/YYYY format
+          const formattedTime = matchDate.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' });
 
-//           // Ensure win rates are properly checked before access
-//           const homeWinRate = match.home_team_win_rate ? match.home_team_win_rate : 0;
-//           const awayWinRate = match.away_team_win_rate ? match.away_team_win_rate : 0;
+          // Ensure win rates are properly checked before access
+          const homeWinRate = match.home_team_win_rate ? match.home_team_win_rate : 0;
+          const awayWinRate = match.away_team_win_rate ? match.away_team_win_rate : 0;
 
-//           return {
-//               id: match.id,
-//               home_team: match.home_team,
-//               away_team: match.away_team,
-//               match_date: formattedDate,
-//               match_time: formattedTime,
-//               match_day: dayOfWeek,
-//               home_win_rate: homeWinRate,
-//               away_win_rate: awayWinRate,
-//           };
-//       });
+          return {
+              id: match.id,
+              home_team: match.home_team,
+              away_team: match.away_team,
+              match_date: formattedDate,
+              match_time: formattedTime,
+              match_day: dayOfWeek,
+              home_win_rate: homeWinRate,
+              away_win_rate: awayWinRate,
+          };
+      });
 
-//       res.status(200).json(matches);
-//   } catch (error) {
-//       console.error('Error fetching teams:', error); // Log the actual error message
-//       next(new AppError('Failed to fetch teams', 500));
-//   }
-// };
+      res.status(200).json(matches);
+  } catch (error) {
+      console.error('Error fetching teams:', error); // Log the actual error message
+      next(new AppError('Failed to fetch teams', 500));
+  }
+};
 
 
 
@@ -397,118 +351,3 @@ exports.fetchLeaderboard = (req, res) =>{
         });
     });
 }
-
-
-// exports.submitSelection = async (req, res) => {
-//     const matchId = req.params.id;
-//     const { selectedTeam, userId, match_date, username, email, phone } = req.body; // Retrieve selected team and user details from the body
-
-//     // Validate inputs
-//     if (!matchId || !selectedTeam || !userId || !match_date || !username || !email || !phone) {
-//         return res.status(400).json({
-//             status: 'error',
-//             message: 'Match ID, selected team, user ID, match date, username, email, and phone are required',
-//         });
-//     }
-
-//     // Get the current week based on the match date
-//     const weekId = getWeekIdFromDate(match_date); // You can implement this function to map match_date to week_id
-
-//     if (!weekId) {
-//         return res.status(400).json({
-//             status: 'error',
-//             message: 'No active NFL week found for the provided match date.',
-//         });
-//     }
-
-//     // Check if the user has already selected a team in the current week
-//     const checkCurrentWeekQuery = `
-//         SELECT * FROM user_selections 
-//         WHERE user_id = ? AND week_id = ?
-//     `;
-
-//     conn.query(checkCurrentWeekQuery, [userId, weekId], (err, currentWeekSelections) => {
-//         if (err) {
-//             console.error('Database error:', err);
-//             return res.status(500).json({
-//                 status: 'error',
-//                 message: 'Failed to check user selections for the current week',
-//             });
-//         }
-
-//         if (currentWeekSelections.length > 0) {
-//             return res.status(400).json({
-//                 status: 'error',
-//                 message: 'You have already selected a team for this week.',
-//             });
-//         }
-
-//         // Check the user's last result
-//         const checkLastSelectionQuery = `
-//             SELECT selected_team, result, week_id FROM user_selections 
-//             WHERE user_id = ? 
-//             ORDER BY match_date DESC LIMIT 1
-//         `;
-
-//         conn.query(checkLastSelectionQuery, [userId], (err, lastResults) => {
-//             if (err) {
-//                 console.error('Database error:', err);
-//                 return res.status(500).json({
-//                     status: 'error',
-//                     message: 'Failed to check user selection',
-//                 });
-//             }
-
-//             if (lastResults.length > 0) {
-//                 const lastResult = lastResults[0].result;
-
-//                 // If the last result was a loss (1), the user is out of the pool
-//                 if (lastResult === 1) {
-//                     return res.status(400).json({
-//                         status: 'error',
-//                         message: 'You have been eliminated from the pool due to your last team result (loss).',
-//                     });
-//                 }
-
-//                 // If the last result was a tie (2) or win (3), they can select a team, but not the same team
-//                 if (lastResult === 2 || lastResult === 3) {
-//                     if (lastResults[0].selected_team === selectedTeam) {
-//                         return res.status(400).json({
-//                             status: 'error',
-//                             message: 'You cannot select the same team again for a new match after a tie or win.',
-//                         });
-//                     }
-
-//                     // Ensure the user selects only for the next week
-//                     if (lastResults[0].week_id >= weekId) {
-//                         return res.status(400).json({
-//                             status: 'error',
-//                             message: 'You can only select a team for the next week.',
-//                         });
-//                     }
-//                 }
-//             }
-
-//             // No issues, proceed to insert the new selection
-//             const insertSelectionQuery = `
-//                 INSERT INTO user_selections (match_id, selected_team, user_id, match_date, username, email, phone, week_id) 
-//                 VALUES (?, ?, ?, ?, ?, ?, ?, ?)
-//             `;
-
-//             conn.query(insertSelectionQuery, [matchId, selectedTeam, userId, match_date, username, email, phone, weekId], (err, result) => {
-//                 if (err) {
-//                     console.error('Database error:', err);
-//                     return res.status(500).json({
-//                         status: 'error',
-//                         message: 'Failed to save selection to the database',
-//                     });
-//                 }
-
-//                 return res.status(200).json({
-//                     status: 'success',
-//                     message: 'Selection submitted successfully!',
-//                 });
-//             });
-//         });
-//     });
-// };

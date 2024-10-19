@@ -1,12 +1,14 @@
-
 const AppError = require("../utils/appError");
 const { validationResult } = require("express-validator");
 require("dotenv").config();
 const conn = require("../services/db");
 const axios = require('axios');
+const moment = require('moment-timezone');
 
 const apiKey = process.env.ODDS_API_KEY; // Store API key in .env file
 
+// Define the timezones you want to support
+const timezones = ['America/New_York', 'Europe/London', 'Asia/Kolkata'];
 
 const nflWeeks = [
   { week: '1', startDate: '2024-09-05', endDate: '2024-09-11' },
@@ -32,51 +34,53 @@ const nflWeeks = [
 // Get home and away teams from Odds API
 exports.getTeams = async (req, res, next) => {
   try {
-      const sport = 'americanfootball_nfl'; // Example sport
-      const region = 'us'; // Example region
-      const markets = 'h2h'; // Head-to-head market for win/loss odds
+    const sport = 'americanfootball_nfl'; // Example sport
+    const region = 'us'; // Example region
+    const markets = 'h2h'; // Head-to-head market for win/loss odds
 
-      const response = await axios.get(`https://api.the-odds-api.com/v4/sports/${sport}/odds`, {
-          params: {
-              apiKey: apiKey,
-              regions: region,
-              markets: markets,
-          },
+    const response = await axios.get(`https://api.the-odds-api.com/v4/sports/${sport}/odds`, {
+      params: {
+        apiKey: apiKey,
+        regions: region,
+        markets: markets,
+      },
+    });
+
+    const matches = response.data.map(match => {
+      // Get match date and time in UTC
+      const matchDateUtc = new Date(match.commence_time);
+      
+      // Convert to each timezone and format
+      const formattedTimes = timezones.map(tz => {
+        const matchDateInTz = moment(matchDateUtc).tz(tz);
+        return {
+          timezone: tz,
+          formattedDate: matchDateInTz.format('YYYY-MM-DD'),
+          formattedTime: matchDateInTz.format('HH:mm:ss'),
+          match_day: matchDateInTz.format('dddd'), // Get the day of the week
+        };
       });
 
-      // Log the API response to check the structure
-      //console.log(response.data);
+      // Ensure win rates are properly checked before access
+      const homeWinRate = match.home_team_win_rate ? match.home_team_win_rate : 0;
+      const awayWinRate = match.away_team_win_rate ? match.away_team_win_rate : 0;
 
-      const matches = response.data.map(match => {
-          // Get match date and time
-          const matchDate = new Date(match.commence_time);
-          const dayOfWeek = matchDate.toLocaleDateString('en-US', { weekday: 'long' });
-          const formattedDate = matchDate.toLocaleDateString('en-US'); // Date in MM/DD/YYYY format
-          const formattedTime = matchDate.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' });
+      return {
+        id: match.id,
+        home_team: match.home_team,
+        away_team: match.away_team,
+        formattedTimes, // All formatted times for each timezone
+        home_win_rate: homeWinRate,
+        away_win_rate: awayWinRate,
+      };
+    });
 
-          // Ensure win rates are properly checked before access
-          const homeWinRate = match.home_team_win_rate ? match.home_team_win_rate : 0;
-          const awayWinRate = match.away_team_win_rate ? match.away_team_win_rate : 0;
-
-          return {
-              id: match.id,
-              home_team: match.home_team,
-              away_team: match.away_team,
-              match_date: formattedDate,
-              match_time: formattedTime,
-              match_day: dayOfWeek,
-              home_win_rate: homeWinRate,
-              away_win_rate: awayWinRate,
-          };
-      });
-
-      res.status(200).json(matches);
+    res.status(200).json(matches);
   } catch (error) {
-      console.error('Error fetching teams:', error); // Log the actual error message
-      next(new AppError('Failed to fetch teams', 500));
+    console.error('Error fetching teams:', error); // Log the actual error message
+    next(new AppError('Failed to fetch teams', 500));
   }
 };
-
 
 
 // Function to get the current week based on today's date

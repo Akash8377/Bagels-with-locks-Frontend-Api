@@ -408,70 +408,125 @@ exports.fetchUserTeamswithPoints = async (req, res) => {
         }
 
         // Organize results by week and accumulate teams
-        const weeklyData = {};
-        const userTeams = {}; // To accumulate teams across weeks
+        const leaderboardByWeek = {};
 
         result.forEach(row => {
             const weekKey = `week${row.week_id}`;
-            if (!weeklyData[weekKey]) {
-                weeklyData[weekKey] = [];
+
+            // Initialize week if not present
+            if (!leaderboardByWeek[weekKey]) {
+                leaderboardByWeek[weekKey] = [];
             }
 
-            // Initialize userTeams for this user if not already
-            if (!userTeams[row.user_id]) {
-                userTeams[row.user_id] = {
+            // Find the user in the leaderboard for the current week
+            let userEntry = leaderboardByWeek[weekKey].find(entry => entry.user_id === row.user_id);
+
+            // If user not found, initialize entry
+            if (!userEntry) {
+                userEntry = {
+                    user_id: row.user_id,
                     username: row.username,
                     total_points: 0,
-                    teams: [],
-                    weekTeams: {} // To track teams by week
+                    teams: ''
                 };
+                leaderboardByWeek[weekKey].push(userEntry);
             }
 
-            // Calculate points for this team based on result value
-            const teamPoints = row.result; // Assuming result contains points directly
-            userTeams[row.user_id].total_points += teamPoints; // Accumulate total points
-
-            // Store the team and its points for the current week
-            if (!userTeams[row.user_id].weekTeams[row.week_id]) {
-                userTeams[row.user_id].weekTeams[row.week_id] = [];
+            // Process the result
+            if (row.result === 3 || row.result === 2) { // Win or Tie
+                userEntry.total_points += row.result; // Accumulate points
+                userEntry.teams += userEntry.teams ? `, ${row.selected_team} (${row.result})` : `${row.selected_team} (${row.result})`;
+            } else if (row.result === 1 || row.result === 0) { // Lose or Pending
+                // Points remain unchanged; show the team data for current week
+                if (userEntry.total_points > 0) {
+                    userEntry.teams += userEntry.teams ? `, ${row.selected_team} (${row.result})` : `${row.selected_team} (${row.result})`;
+                } else {
+                    // Include this user in the leaderboard even if they lost or the result is pending
+                    userEntry.teams += userEntry.teams ? `, ${row.selected_team} (${row.result})` : `${row.selected_team} (${row.result})`;
+                }
             }
-
-            userTeams[row.user_id].weekTeams[row.week_id].push({
-                name: row.selected_team,
-                points: teamPoints
-            });
         });
 
-        // Create leaderboard for each week
-        Object.keys(userTeams).forEach(userId => {
-            const user = userTeams[userId];
-            const totalPointsByWeek = {}; // Total points for each week
-
-            // Calculate cumulative points for each week based on teams
-            Object.keys(user.weekTeams).forEach(weekId => {
-                const teams = user.weekTeams[weekId];
-                const teamEntries = teams.map(team => `${team.name} (${team.points})`).join(', ');
-                totalPointsByWeek[weekId] = {
-                    username: user.username,
-                    total_points: user.total_points, // Total across all weeks
-                    teams: teamEntries
-                };
-                weeklyData[`week${weekId}`].push(totalPointsByWeek[weekId]);
-            });
+        // Carry forward points and teams to the next week
+        Object.keys(leaderboardByWeek).forEach((weekKey, index) => {
+            const currentWeekEntries = leaderboardByWeek[weekKey];
+            if (index < Object.keys(leaderboardByWeek).length - 1) {
+                const nextWeekKey = `week${parseInt(weekKey.replace('week', '')) + 1}`;
+                currentWeekEntries.forEach(entry => {
+                    // Check the result of the current week
+                    const currentResult = result.find(r => r.user_id === entry.user_id && r.week_id === parseInt(weekKey.replace('week', '')));
+        
+                    // Only carry forward if currentResult is not 0 or 1
+                    if (currentResult && currentResult.result !== 0 && currentResult.result !== 1) {
+                        const nextWeekEntry = leaderboardByWeek[nextWeekKey].find(e => e.user_id === entry.user_id) || { username: entry.username, total_points: 0, teams: '' };
+                        
+                        // Carry forward points
+                        nextWeekEntry.total_points += entry.total_points;
+        
+                        // Prepend past week's teams before current week's teams
+                        nextWeekEntry.teams = nextWeekEntry.teams 
+                            ? `${entry.teams}, ${nextWeekEntry.teams}`  // Prepend past week's data
+                            : entry.teams;  // If next week has no data, just add past week's data
+        
+                        leaderboardByWeek[nextWeekKey] = leaderboardByWeek[nextWeekKey] || [];
+        
+                        // Add the user entry if they don't exist in the next week
+                        if (!leaderboardByWeek[nextWeekKey].some(e => e.user_id === entry.user_id)) {
+                            leaderboardByWeek[nextWeekKey].push(nextWeekEntry);
+                        }
+                    }
+                });
+            }
         });
 
         // Sort each week's data by total points in descending order
-        Object.keys(weeklyData).forEach(weekKey => {
-            weeklyData[weekKey].sort((a, b) => b.total_points - a.total_points);
+        Object.keys(leaderboardByWeek).forEach(weekKey => {
+            leaderboardByWeek[weekKey].sort((a, b) => b.total_points - a.total_points);
         });
 
         return res.status(200).json({
             status: 'success',
-            data: weeklyData,
+            data: leaderboardByWeek,
         });
     });
-}
+};
 
+exports.fetchUserResults = async (req, res) => {
+    const userId = req.params.userId; // Get user ID from URL params
 
+    if (!userId) {
+        return res.status(400).json({
+            status: 'error',
+            message: 'User ID is required',
+        });
+    }
 
+   
+    // Query to get all selections made by the user for the current week
+    const sqlQuery = `
+        SELECT result FROM user_selections 
+        WHERE user_id =?
+    `;
 
+    conn.query(sqlQuery, [userId], (err, results) => {
+        if (err) {
+            console.error('Database error:', err);
+            return res.status(500).json({
+                status: 'error',
+                message: 'Failed to retrieve user selections from the database',
+            });
+        }
+
+        if (results.length === 0) {
+            return res.status(404).json({
+                status: 'error',
+                message: 'No selections found for this user in the current week',
+            });
+        }
+
+        return res.status(200).json({
+            status: 'success',
+            data: results,
+        });
+    });
+};

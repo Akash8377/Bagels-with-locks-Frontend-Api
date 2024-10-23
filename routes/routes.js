@@ -105,6 +105,8 @@ router.post('/submit-selection/:id', pollRoutes.submitSelection);
 router.get('/user-selections/:userId', pollRoutes.fetchUserSelections);
 // router.get('/user-selections/:userId/:week_id', pollRoutes.fetchUserSelections);
 router.get('/user-leaderboard', pollRoutes.fetchLeaderboard)
-router.get('/fetchwithpoints/', pollRoutes.fetchUserTeamswithPoints);
+router.get('/fetchwithpoints', pollRoutes.fetchUserTeamswithPoints);
+router.get('/fetchresult/:userId', pollRoutes.fetchUserResults);
+
 
 module.exports = router; 

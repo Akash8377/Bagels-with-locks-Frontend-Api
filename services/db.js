@@ -36,5 +36,5 @@ module.exports = conn;
 //   database: "bagels",
 // });
 
-// conn.connect();
-// module.exports = conn;
+conn.connect();
+module.exports = conn;

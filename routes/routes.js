@@ -34,7 +34,7 @@ const {
 } = require("../helper/validation");
 
 // User Auth route
-router.post("/charge", createPaymentIntent);
+// router.post("/charge", createPaymentIntent);
 router.post("/register", signUpValidation, userController.register);
 router.post("/login", loginUpValidataion, userController.getUserLogin);
 router.get("/welcome", auth.verifyToken, userController.welcome);

@@ -24,7 +24,8 @@ router.post('/charge', async (req, res) => {
     const customerName = paymentMethod.billing_details.name || 'Unknown User';
     const customerEmail = paymentMethod.billing_details.email || 'Unknown Email';
     const customerPhone = paymentMethod.billing_details.phone || 'Unknown Phone';
-
+    const created_at = new Date();
+    
     // Create payment intent
     const paymentIntent = await stripe.paymentIntents.create({
       amount: Math.round(amount),

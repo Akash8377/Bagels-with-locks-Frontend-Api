@@ -4,12 +4,16 @@ const { SMTP_MAIL, SMTP_PASSWORD } = process.env;
 const sendMail = async (email, mailSubjet, content) => {
   try {
     const transport = nodemailer.createTransport({
+      service:'gmail',
       host: "smtp.gmail.com",
       port: 587,
       secure: false,
       auth: {
-        user: "vinod.mediasearchgroup@gmail.com",
-        pass: "ieee leja pfsc ptix",
+        // user: "vinod.mediasearchgroup@gmail.com",
+        // pass: "ieee leja pfsc ptix",
+        user: SMTP_MAIL,       // Access SMTP_MAIL from .env
+        pass: SMTP_PASSWORD,
+        
       },
     });
     const mailOption = {

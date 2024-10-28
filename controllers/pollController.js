@@ -31,52 +31,52 @@ const nflWeeks = [
 
 // Get home and away teams from Odds API
 exports.getTeams = async (req, res, next) => {
-  try {
-      const sport = 'americanfootball_nfl'; // Example sport
-      const region = 'us'; // Example region
-      const markets = 'h2h'; // Head-to-head market for win/loss odds
-
-      const response = await axios.get(`https://api.the-odds-api.com/v4/sports/${sport}/odds`, {
-          params: {
-              apiKey: apiKey,
-              regions: region,
-              markets: markets,
-          },
-      });
-
-      // Log the API response to check the structure
-      //console.log(response.data);
-
-      const matches = response.data.map(match => {
-          // Get match date and time
-          const matchDate = new Date(match.commence_time);
-          const dayOfWeek = matchDate.toLocaleDateString('en-US', { weekday: 'long' });
-          const formattedDate = matchDate.toLocaleDateString('en-US'); // Date in MM/DD/YYYY format
-          const formattedTime = matchDate.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' });
-
-          // Ensure win rates are properly checked before access
-          const homeWinRate = match.home_team_win_rate ? match.home_team_win_rate : 0;
-          const awayWinRate = match.away_team_win_rate ? match.away_team_win_rate : 0;
-
-          return {
-              id: match.id,
-              home_team: match.home_team,
-              away_team: match.away_team,
-              match_date: formattedDate,
-              match_time: formattedTime,
-              match_day: dayOfWeek,
-              home_win_rate: homeWinRate,
-              away_win_rate: awayWinRate,
-          };
-      });
-
-      res.status(200).json(matches);
-  } catch (error) {
-      console.error('Error fetching teams:', error); // Log the actual error message
-      next(new AppError('Failed to fetch teams', 500));
-  }
-};
-
+    try {
+        const sport = 'americanfootball_nfl'; // Example sport
+        const region = 'us'; // Example region
+        const markets = 'h2h'; // Head-to-head market for win/loss odds
+  
+        const response = await axios.get(`https://api.the-odds-api.com/v4/sports/${sport}/odds`, {
+            params: {
+                apiKey: apiKey,
+                regions: region,
+                markets: markets,
+            },
+        });
+  
+        // Log the API response to check the structure
+        //console.log(response.data);
+  
+        const matches = response.data.map(match => {
+            // Get match date and time
+            const matchDate = new Date(match.commence_time);
+            const dayOfWeek = matchDate.toLocaleDateString('en-US', { weekday: 'long' });
+            const formattedDate = matchDate.toLocaleDateString('en-US'); // Date in MM/DD/YYYY format
+            const formattedTime = matchDate.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' });
+  
+            // Ensure win rates are properly checked before access
+            const homeWinRate = match.home_team_win_rate ? match.home_team_win_rate : 0;
+            const awayWinRate = match.away_team_win_rate ? match.away_team_win_rate : 0;
+  
+            return {
+                id: match.id,
+                home_team: match.home_team,
+                away_team: match.away_team,
+                match_date: formattedDate,
+                match_time: formattedTime,
+                match_day: dayOfWeek,
+                home_win_rate: homeWinRate,
+                away_win_rate: awayWinRate,
+            };
+        });
+  
+        res.status(200).json(matches);
+    } catch (error) {
+        console.error('Error fetching teams:', error); // Log the actual error message
+        next(new AppError('Failed to fetch teams', 500));
+    }
+  };
+  
 
 
 // Function to get the current week based on today's date

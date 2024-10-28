@@ -635,3 +635,34 @@ exports.checkuser = (req, res) => {
     );
   }
 };
+
+//Delete user profile
+
+exports.delete_user_image = (req, res) =>{
+ const authToken = req.headers.authorization.split(" ")[1];
+
+ try{
+  const decode = jwt.verify(authToken, token_key);
+  const user_id = decode.id;
+
+  const sqlQuery = `UPDATE users SET image = NULL WHERE id = ?;`
+
+  conn.query(sqlQuery, [user_id], (err, result) =>{
+    if(err){
+      return res.status(500).send({
+        msg:"Error deleting user image",
+      });
+    }else{
+      res.status(200).send({
+        status:"success",
+        msg:"User image delete Successfully",
+      })
+    }
+  })
+ } catch(err){
+  return res.status(500).send({
+    msg:"Authentication error",
+    error: err.message,
+  })
+ }
+}

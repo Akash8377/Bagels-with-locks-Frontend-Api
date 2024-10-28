@@ -40,6 +40,7 @@ router.post("/login", loginUpValidataion, userController.getUserLogin);
 router.get("/welcome", auth.verifyToken, userController.welcome);
 router.post("/profile/update", auth.verifyToken, userController.update_profile);
 router.post("/user_image/update/:user_id", userController.update_user_image)
+router.post("/user_image/remove/:user_id",  auth.verifyToken, userController.delete_user_image);
 router.post(
   "/profile/change-password",
   auth.verifyToken,

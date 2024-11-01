@@ -440,6 +440,83 @@ exports.update_user_image = [upload.single('image'), (req, res) => {
   });
 }];
 
+// exports.removeProfilePicture = (req, res) => {
+//   const authToken = req.headers.authorization.split(" ")[1];
+  
+//   // Validate the JWT token
+//   const decode = jwt.verify(authToken, token_key);
+//   const user_id = decode.id;
+
+//   // Prepare the SQL query to get the current image
+//   const getImageQuery = `SELECT image FROM users WHERE id = ?;`;
+  
+//   conn.query(getImageQuery, [user_id], (err, result) => {
+//       if (err) {
+//           console.error('Database error:', err);
+//           return res.status(500).send({ msg: 'Database error' });
+//       }
+
+//       if (result.length > 0) {
+//           const imagePath = path.join(__dirname, 'public/uploads', result[0].image);
+
+//           // Delete the image file from the server
+//           fs.unlink(imagePath, (fsErr) => {
+//               if (fsErr) {
+//                   console.error('File deletion error:', fsErr);
+//                   return res.status(500).send({ msg: 'Error deleting image file' });
+//               }
+
+//               // Prepare the SQL query to update the user image to NULL
+//               const sqlQuery = `UPDATE users SET image = NULL WHERE id = ?;`;
+//               conn.query(sqlQuery, [user_id], (updateErr) => {
+//                   if (updateErr) {
+//                       console.error('Database update error:', updateErr);
+//                       return res.status(500).send({ msg: 'Error updating database' });
+//                   }
+
+//                   // Return success message after updating
+//                   res.status(200).send({
+//                       status: "success",
+//                       msg: "Profile picture removed successfully",
+//                   });
+//               });
+//           });
+//       } else {
+//           res.status(404).send({ msg: 'User not found' });
+//       }
+//   });
+// };
+
+exports.removeProfilePicture = (req, res) => {
+  const authToken = req.headers.authorization.split(" ")[1];
+
+  // Validate the JWT token
+  const decode = jwt.verify(authToken, token_key);
+  const user_id = decode.id;
+
+  // Prepare the SQL query to update the user image to NULL
+  const sqlQuery = `UPDATE users SET image = NULL WHERE id = ?;`;
+
+  conn.query(sqlQuery, [user_id], (err, result) => {
+      if (err) {
+          console.error('Database error:', err);
+          return res.status(500).send({ msg: 'Error updating database' });
+      }
+
+      // Check if any rows were affected
+      if (result.affectedRows === 0) {
+          return res.status(404).send({ msg: 'User not found or image already null' });
+      }
+
+      // Return success message after updating
+      res.status(200).send({
+          status: "success",
+          msg: "Profile picture removed successfully",
+      });
+  });
+};
+
+
 exports.update_password = (req, res) => {
   // Ensure required fields exist in the request
   if (
@@ -638,31 +715,70 @@ exports.checkuser = (req, res) => {
 
 //Delete user profile
 
-exports.delete_user_image = (req, res) =>{
- const authToken = req.headers.authorization.split(" ")[1];
+// exports.delete_user_image = (req, res) =>{
+//  const authToken = req.headers.authorization.split(" ")[1];
 
- try{
-  const decode = jwt.verify(authToken, token_key);
-  const user_id = decode.id;
+//  try{
+//   const decode = jwt.verify(authToken, token_key);
+//   const user_id = decode.id;
 
-  const sqlQuery = `UPDATE users SET image = NULL WHERE id = ?;`
+//   const sqlQuery = `UPDATE users SET image = NULL WHERE id = ?;`
 
-  conn.query(sqlQuery, [user_id], (err, result) =>{
-    if(err){
-      return res.status(500).send({
-        msg:"Error deleting user image",
-      });
-    }else{
-      res.status(200).send({
-        status:"success",
-        msg:"User image delete Successfully",
-      })
-    }
-  })
- } catch(err){
-  return res.status(500).send({
-    msg:"Authentication error",
-    error: err.message,
-  })
- }
-}
+//   conn.query(sqlQuery, [user_id], (err, result) =>{
+//     if(err){
+//       return res.status(500).send({
+//         msg:"Error deleting user image",
+//       });
+//     }else{
+//       res.status(200).send({
+//         status:"success",
+//         msg:"User image delete Successfully",
+//       })
+//     }
+//   })
+//  } catch(err){
+//   return res.status(500).send({
+//     msg:"Authentication error",
+//     error: err.message,
+//   })
+//  }
+// }
+
+exports.delete_user_image = (req, res) => {
+  // Check for the presence of an authorization header
+  if (!req.headers.authorization) {
+    return res.status(401).send({
+      msg: "Authorization header missing",
+    });
+  }
+
+  const authToken = req.headers.authorization.split(" ")[1];
+
+  try {
+    // Verify token
+    const decode = jwt.verify(authToken, token_key);
+    const user_id = decode.id;
+
+    // SQL query to set the image field to NULL for the user
+    const sqlQuery = `UPDATE users SET image = NULL WHERE id = ?;`;
+
+    conn.query(sqlQuery, [user_id], (err, result) => {
+      if (err) {
+        return res.status(500).send({
+          msg: "Error deleting user image",
+        });
+      } else {
+        res.status(200).send({
+          status: "success",
+          msg: "User image deleted successfully",
+        });
+      }
+    });
+  } catch (err) {
+    // Catch any token verification errors
+    return res.status(401).send({
+      msg: "Authentication error",
+      error: err.message,
+    });
+  }
+};

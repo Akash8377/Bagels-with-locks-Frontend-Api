@@ -14,7 +14,7 @@ const path = require('path');
 
 // User Register
 
-const baseUrl = `https://www.spreadsandlocks.com`;
+const baseUrl = `http://${process.env.HOST}:${process.env.PORT}`;
 
 exports.register = (req, res) => {
   const errors = validationResult(req);
@@ -259,7 +259,7 @@ exports.forget_password = (req, res) => {
         let mailSubjet = "Reset Your Password";
         const randomToken = randomstring.generate();
        // let verificationLink = `http://127.0.0.1:9900/reset-password?token=${randomToken}`;
-        let verificationLink = `${baseUrl}/reset-password?token=${randomToken}`;
+        let verificationLink = `https://spreadsandlocks.com/reset-password?token=${randomToken}`;
         const template = await fs.readFile(
           "views/send-reset-password-mail.ejs",
           "utf-8"

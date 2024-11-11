@@ -14,6 +14,8 @@ const path = require('path');
 
 // User Register
 
+const baseUrl = `https://www.spreadsandlocks.com`;
+
 exports.register = (req, res) => {
   const errors = validationResult(req);
   if (!errors.isEmpty()) {
@@ -256,7 +258,8 @@ exports.forget_password = (req, res) => {
       if (result.length > 0) {
         let mailSubjet = "Reset Your Password";
         const randomToken = randomstring.generate();
-        let verificationLink = `http://127.0.0.1:9900/reset-password?token=${randomToken}`;
+       // let verificationLink = `http://127.0.0.1:9900/reset-password?token=${randomToken}`;
+        let verificationLink = `${baseUrl}/reset-password?token=${randomToken}`;
         const template = await fs.readFile(
           "views/send-reset-password-mail.ejs",
           "utf-8"

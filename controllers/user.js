@@ -258,7 +258,7 @@ exports.forget_password = (req, res) => {
       if (result.length > 0) {
         let mailSubjet = "Reset Your Password";
         const randomToken = randomstring.generate();
-       // let verificationLink = `http://127.0.0.1:9900/reset-password?token=${randomToken}`;
+      //  let verificationLink = `http://localhost:3000/reset-password?token=${randomToken}`;
         let verificationLink = `https://spreadsandlocks.com/reset-password?token=${randomToken}`;
         const template = await fs.readFile(
           "views/send-reset-password-mail.ejs",
@@ -307,7 +307,7 @@ exports.forget_password = (req, res) => {
 
 exports.reset_password = (req, res) => {
   try {
-    const token = req.query.token; // Changed from req.params.token to req.query.token
+    const token = req.params.token;
     let sqlQuery = "SELECT * FROM password_reset where token = ?";
 
     conn.query(sqlQuery, [token], (err, result) => {
@@ -335,7 +335,7 @@ exports.reset_password = (req, res) => {
 };
 
 exports.reset_password_update = (req, res) => {
-  if (req.body.password != req.body.confirmPassword) {
+  /* if (req.body.password != req.body.confirmPassword) {
     res.render("reset-password", {
       error_message: "Confirm Password not Matching",
       user: { id: req.body.user_id, email: req.body.email },
@@ -351,7 +351,51 @@ exports.reset_password_update = (req, res) => {
       );
       return res.render("update-password-message");
     }
-  });
+  });*/
+  const { token, newPassword } = req.body;
+
+  if (!token || !newPassword) {
+    return res
+      .status(400)
+      .send({ msg: "Token and new password are required." });
+  }
+
+  // Check if the token exists in the database
+  conn.query(
+    "SELECT * FROM users WHERE password_reset_token = ?",
+    [token],
+    async (error, results) => {
+      if (error) {
+        return res.status(500).send({ msg: error });
+      }
+
+      if (results.length === 0) {
+        return res.status(404).send({ msg: "Invalid or expired token." });
+      }
+
+      try {
+        // Hash the new password
+        const saltRounds = 10;
+        const hashedPassword = await bcrypt.hash(newPassword, saltRounds);
+
+        // Update the user's password and clear the reset token
+        const userEmail = results[0].email;
+        conn.query(
+          "UPDATE users SET password = ?, password_reset_token = NULL WHERE email = ?",
+          [hashedPassword, userEmail],
+          (err) => {
+            if (err) {
+              return res.status(500).send({ msg: err });
+            }
+
+            return res.status(200).send({ msg: "Password reset successful." });
+          }
+        );
+      } catch (hashError) {
+        return res.status(500).send({ msg: "Error hashing password." });
+      }
+    }
+  );
 };
 
 exports.update_profile = (req, res) => {

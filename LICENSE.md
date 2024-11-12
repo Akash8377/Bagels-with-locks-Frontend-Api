@@ -1,6 +1,6 @@
 MIT License
 
-Copyright (c) 2023 Dubai Private Tour
+Copyright (c) 2024 Spreads and locks
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software for personal uses, but you are using for corporate work then you need to talk for copywight:

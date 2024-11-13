@@ -22,6 +22,7 @@ const contactUs = require("../controllers/contactus");
 const promocode = require("../controllers/promocode");
 const podcastController = require("../controllers/podcast");
 const pollRoutes = require("../controllers/pollController")
+const topMessageRoutes = require('../controllers/topmessags')
 const { createPaymentIntent } = require("../controllers/paymentController");
 
 const {
@@ -108,6 +109,10 @@ router.get('/user-selections/:userId', pollRoutes.fetchUserSelections);
 router.get('/user-leaderboard', pollRoutes.fetchLeaderboard)
 router.get('/fetchwithpoints', pollRoutes.fetchUserTeamswithPoints);
 router.get('/fetchresult/:userId', pollRoutes.fetchUserResults);
+
+//top message
+
+router.get('/fetch-topmessage', topMessageRoutes.get)
 
 
 module.exports = router; 
